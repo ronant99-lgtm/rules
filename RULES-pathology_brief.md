@@ -42,8 +42,32 @@ Avant toute recherche web, évaluer :
 
 ---
 
+### Étape B0 — RECON (nouvelle — avant les recherches ciblées)
+
+Avant de lancer les 3 recherches structurées de l'Étape B, effectuer **une recherche large
+non structurée** sur la pathologie :
+
+- Requête type : `"[pathologie]" overview OR review OR management 2020 2025`
+- Objectif : cartographier la terminologie en usage, identifier les sous-domaines actifs,
+  repérer les auteurs récurrents et les groupes coopérateurs impliqués
+- Durée : courte — cette étape ne produit pas de synthèse, elle informe les étapes suivantes
+
+**Ce que la RECON doit capturer :**
+- Terminologies alternatives ou historiques (ex. nom OMS ancien vs actuel)
+- Existence de sous-groupes moléculaires ou histologiques distincts dans la littérature
+- Groupes institutionnels ou consortiums publiant régulièrement sur cette entité
+- Papers à haute citation apparus dans les résultats (signal de référence fondatrice)
+
+> Si la RECON ne retourne que peu de résultats (< 5 publications pertinentes),
+> le signaler immédiatement : *« La littérature indexée sur cette entité est très limitée —
+> moins de 5 publications pertinentes identifiées. La note reposera principalement sur
+> des données de cas et des analogies avec des entités voisines. »*
+
+---
+
 ### Étape B — Recherche web systématique
-Effectuer **au minimum 3 recherches web** dans l'ordre suivant :
+Effectuer **au minimum 3 recherches web** dans l'ordre suivant, en s'appuyant sur les
+termes et sous-domaines identifiés à l'Étape B0 :
 
 1. **PubMed / PMC** — séries rétrospectives et reviews (filtre : 2020–présent)
    - Requête type : `"[pathologie]" treatment series 2020 2021 2022 2023 2024 2025`
@@ -66,6 +90,26 @@ Effectuer **au minimum 3 recherches web** dans l'ordre suivant :
      pour que je l'intègre à la note. »*
    - Ne jamais synthétiser une guideline sur la seule base de son titre ou résumé
      sans le signaler explicitement.
+
+---
+
+### Étape B+ — Tracking transversal (nouveau — pendant et après l'Étape B)
+
+Au fil des recherches, maintenir un tracking explicite sur trois dimensions :
+
+**Papers récurrents** — un paper apparaissant dans 2+ recherches distinctes est
+probablement une référence fondatrice. Le signaler dans la note avec la mention :
+> 🔁 *Référence récurrente — probablement incontournable pour ce domaine.*
+
+**Auteurs récurrents** — si un même auteur ou groupe apparaît dans ≥ 2 recherches,
+l'identifier dans la section Références avec la mention du groupe/institution.
+
+**Signal citation** — pour les pathologies avec peu de littérature, noter les papers
+dont le ratio citations/an depuis publication est anormalement élevé — ils représentent
+souvent la série de référence même si anciens.
+
+> Ce tracking est **visible dans la note finale** : une courte mention
+> « Papers récurrents identifiés : [liste] » en tête de la section Références.
 
 ---
 
@@ -128,6 +172,7 @@ Chaque section doit être présente ; indiquer « Données insuffisantes » si v
 - Limiter à 5–8 références les plus impactantes
 - Toujours inclure la référence OMS si pertinente
 - Indiquer le niveau de preuve entre crochets : [série rétrospective], [guideline], etc.
+- Mentionner les papers récurrents identifiés par le tracking transversal (🔁)
 ```
 
 ---
@@ -172,7 +217,7 @@ pas proposer la fiche.
 5. Algorithme décisionnel *(étapes numérotées)*
 6. Pronostic *(pills / chiffres clés)*
 7. Protocoles & guidelines
-8. Références *(liste numérotée, pleine largeur)*
+8. Références *(liste numérotée, pleine largeur, avec badges et marqueur 🔁 si applicable)*
 
 **Alertes visuelles** — bandeau en haut, icône + texte court :
 - `⚠ Pas de consensus` — absence de standard
@@ -237,5 +282,6 @@ Pour toute pathologie rare en oncologie (France) :
 
 ---
 
-*v0.3 — Avril 2026. Ajouts : cadrage préalable (Étape 0), demande de références
-complémentaires (Étape B4), structure HTML détaillée (layout, ordre, badges, alertes).*
+*v0.4 — Mai 2026. Ajouts : phase RECON (Étape B0) avant les recherches ciblées ;
+tracking transversal des papers récurrents, auteurs et signal citation (Étape B+) ;
+marqueur 🔁 dans les références.*
