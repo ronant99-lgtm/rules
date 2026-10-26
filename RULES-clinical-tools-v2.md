@@ -1,7 +1,8 @@
 # Règles de création — Outils cliniques interactifs
 
 > Fichier de référence pour la génération d'outils de stratification et de logigrammes en oncologie pédiatrique.  
-> Dernière mise à jour : avril 2026 (v2.1 — ajout Type D : tableau de bord de revue clinique avec toggle thème universel)
+> Dernière mise à jour : octobre 2026 (v2.2 — ajout Type E : atlas par situations cliniques ; règle 6-E de vérification des sources)  
+> v2.1 (avril 2026) — ajout Type D : tableau de bord de revue clinique avec toggle thème universel
 
 ---
 
@@ -136,6 +137,64 @@ body.light .rt-table tr:hover td { background: #ede8dc; }
 body.light .trial-card { box-shadow: 0 1px 4px rgba(0,0,0,.06); }
 body.light .signal-box { color: #3a2e1a; }
 ```
+
+### Type E — Atlas par situations cliniques (nouveau — v2.2)
+
+**Référence d'implémentation :** `neuro-onco-atlas.html` (dépôt `neuro`)
+
+**Usage :** fichier unique regroupant plusieurs entités (protocoles de recherche **et** revues de littérature) sous une forme homogène : une entité = une **carte de décision** de ses situations cliniques finales ; une situation = une **fiche** au gabarit invariable. Remplace, pour les entités couvertes, le wizard pas-à-pas (Type AB) et le panel de revue (Type D).
+
+> **Principe :** le pas-à-pas est supprimé dès que les situations finales sont peu nombreuses (≤ 15 environ). Ce qui compte est la **situation finale homogène**, avec le niveau de détail maximal du résultat du wizard. Le logigramme D3 est conservé **uniquement pour les protocoles de recherche** (vue secondaire, feuilles cliquables vers la fiche).
+
+Structure (routage par `location.hash`, pas de rechargement) :
+```
+header (sticky) · fil d'Ariane (sticky)
+#/                     → accueil : cartes d'entités groupées par famille + légendes + journal d'audit
+#/e/<entité>           → page entité
+     ├─ bandeau d'identité (OMS, biologie, pronostic, points clés) + alertes
+     ├─ onglets : ⬡ Decision map | ⬡ Interactive flowchart (protocoles de recherche uniquement)
+     ├─ filtres (puces par axe : âge, statut M, résection, biologie…)
+     ├─ carte de décision : groupes → tuiles de situation (couleur de risque + dose clé par protocole)
+     └─ sections repliables : contexte, essais, références
+#/e/<entité>/s/<id>    → fiche situation
+#/e/<entité>/flow      → logigramme D3 (construit à l'affichage)
+```
+
+**Gabarit invariable de la fiche situation (dans cet ordre) :**
+
+1. En-tête : entité · titre · badge de risque
+2. **Définition de la situation** (critères d'entrée, grille de cellules)
+3. **Colonnes protocole côte à côte** (une par référentiel : COG / SIOP-E / littérature…), chacune avec :
+   * en-tête protocole + **badge de niveau de preuve** (voir ci-dessous)
+   * outcomes d'efficacité (§6-B)
+   * chimiothérapie (schéma complet, doses si disponibles)
+   * bloc RT Timing · Volumes · Doses (§6-B2) ou `.no-rt-box` explicite
+   * puce `⚠ verify` + texte si une donnée n'a pas pu être confirmée
+4. **Colonne réservée** (pointillés) pour un protocole à venir (ex. SIOP CNS GCT III, SIOP Ependymoma II)
+5. Notes cliniques (divergences entre protocoles, pièges)
+6. Références filtrées (uniquement celles citées dans la fiche)
+7. Navigation précédent / suivant + export PDF
+
+**Badges de niveau de preuve (obligatoires sur chaque colonne) :**
+
+| Classe | Libellé | Usage |
+|-|-|-|
+| `ev rct` | Randomized trial | bras d'un essai randomisé |
+| `ev trial` | Prospective trial / protocol | phase II mono-bras ou traitement défini par protocole |
+| `ev cons` | Consensus / guideline | consensus, document ESCP, recommandations |
+| `ev retro` | Retrospective series | registre, cohorte rétrospective |
+| `ev exp` | Expert opinion / case-level | cas cliniques, pratique d'expert |
+| `ev pend` | Results pending | essai en cours, données non matures |
+
+> Une fiche issue d'un protocole et une fiche issue d'une série rétrospective ont la même apparence : **seul le badge** distingue leur solidité. Il ne doit jamais être omis.
+
+**Couleurs de situation :** `lr` vert · `sr` bleu · `hr` rouge · `sp` jaune (rechute, tératome, situation spéciale) · `inf` violet (nourrisson / HDCT sans RT) · `off` gris (hors protocole / décision individuelle).
+
+**Puces protocole :** `.chip.cog` orange · `.chip.siop` bleu · `.chip.lit` violet · `.chip.pend` pointillés.
+
+**Données séparées du rendu :** un objet par entité (`id, name, family, desc, sources, identity, alerts, axes, groups, refs, situations, context, trials, flow?, pending?`) ; une situation = `{ title, risk, badge, tags, def, arms[], notes }` ; un bras = `{ proto, pc, label, ev, key, out[], chemo, rt | noRt, refs[] }`. Un seul moteur de rendu pour toutes les entités — c'est ce qui garantit l'homogénéité.
+
+**Langue :** `lang="en"` (choix validé pour l'atlas) ; les règles §6.1 restent valables pour les outils Type AB francophones.
 
 ---
 
@@ -1156,6 +1215,19 @@ function printResult() {
 
 ---
 
+## 6-E. RÈGLE — Vérification des sources avant publication ⚠️ (v2.2)
+
+> Ajoutée après l'audit d'octobre 2026 : sur les 7 outils non-médulloblastome, environ un tiers des identifiants NCT et plusieurs références étaient faux (NCT d'essais sans rapport, DOI erronés, chiffres attribués au mauvais article, références introuvables).
+
+* **Chaque DOI / référence** est vérifié dans PubMed (titre, premier auteur, année, volume, pages) avant publication.
+* **Chaque chiffre d'outcome** doit figurer dans la référence citée (au minimum dans le résumé) ; sinon il est retiré ou marqué `⚠ verify`.
+* **Chaque NCT** est vérifié sur ClinicalTrials.gov : bonne pathologie, bon statut (RECRUITING / ACTIVE · NR / COMPLETED / TERMINATED…), à la date de mise à jour.
+* **Interdit :** citer une référence « retrouvée par recherche sémantique » sans DOI vérifié ; attribuer un résultat d'un sous-groupe à un autre ; présenter des fourchettes approximatives comme résultats d'essai.
+* Toute correction par rapport à une version antérieure est consignée dans le **journal d'audit** de l'outil (Type E : encadré « Source audit » de l'accueil).
+* Données non vérifiables mais utiles (doses issues d'un protocole non public, pratique d'expert) : conservées avec la puce `⚠ verify` et une phrase expliquant ce qui reste à confirmer.
+
+---
+
 ## 7. Conventions de code
 
 ### 7.1 Organisation CSS (sections commentées)
@@ -1318,6 +1390,20 @@ Affiché uniquement si `navStack.length > 0`.
 * [ ] `initTheme()` appelé après les fonctions JS (hors DOMContentLoaded)
 * [ ] `lang="fr"` ou `lang="en"` selon langue du contenu
 * [ ] Disclaimer footer dans le header
+
+### Type E — Atlas par situations cliniques
+
+* [ ] Fichier unique, routage `#/`, `#/e/<entité>`, `#/e/<entité>/s/<id>`, `#/e/<entité>/flow`
+* [ ] Chaque entité : bandeau d'identité + carte de décision filtrable + sections repliables (contexte, essais, références)
+* [ ] Chaque situation appartient à un groupe de la carte (pas de situation orpheline)
+* [ ] Fiche au gabarit invariable : définition · colonnes protocole · notes · références · navigation · PDF
+* [ ] Badge de niveau de preuve sur **chaque** colonne protocole
+* [ ] Bloc RT Timing · Volumes · Doses ou `.no-rt-box` explicite dans chaque colonne
+* [ ] Colonne réservée pour tout protocole à venir annoncé
+* [ ] Logigramme D3 seulement pour les protocoles de recherche ; feuilles cliquables vers la fiche
+* [ ] Toutes les références citées `[n]` existent dans l'objet `refs` de l'entité (test automatisé)
+* [ ] Règle 6-E appliquée : DOI / NCT / chiffres vérifiés ; `⚠ verify` sinon ; journal d'audit à jour
+* [ ] Test navigateur : 0 erreur console, toutes les fiches rendues, mobile 390 px sans défilement horizontal
 
 ---
 
