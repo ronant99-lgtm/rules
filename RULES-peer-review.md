@@ -207,7 +207,7 @@ Déclenché par : *"review complète de cet article"*, *"fais-moi un rapport de 
 ### Mode LECTURE CIBLÉE
 Déclenché par une question spécifique : *"analyse la méthode statistique"*, *"regarde les critères d'inclusion"*, *"est-ce que les conclusions sont justifiées ?"*
 
-→ Répondre spécifiquement à la question posée, en mode "day science" (critique, factuel, sans extrapolation).
+→ Répondre spécifiquement à la question posée, de façon critique et factuelle, sans extrapolation.
 
 ### Mode RÉSUMÉ CRITIQUE
 Déclenché par : *"fiche de lecture"*, *"résumé critique"*
@@ -238,4 +238,4 @@ Avant de rédiger le rapport, si le journal cible est connu, adapter le niveau d
 ---
 
 *Fichier à stocker dans le vault Obsidian sous `/Rules/RULES-peer-review.md`*
-*Compatible avec les workflows "day science" définis dans RULES-day-science.md*
+*Règles communes (références, niveaux de preuve) : `SOCLE-clinique.md`.*
